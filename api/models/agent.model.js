@@ -6,21 +6,18 @@ const agentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    role: {
+      type: String,
+      default: "AI Assistant",
     },
-
     systemPrompt: {
       type: String,
-      default: "You are a helpful AI assistant.",
+      required: true,
     },
-
-    model: {
-      type: String,
-      default: "gpt-4.1-mini",
+    projectId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+      required: true,
     },
   },
   { timestamps: true }

@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
 import projectRouter from './routes/project.route.js';
+import agentRouter from './routes/agent.route.js';
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.listen(3000, () => {
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/projects', projectRouter);
+app.use("/api/agents", agentRouter);
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;

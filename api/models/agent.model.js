@@ -6,22 +6,21 @@ const agentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    role: {
+    description: {
       type: String,
-      default: "AI Assistant",
-    },
-    systemPrompt: {
-      type: String,
-      required: true,
     },
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project",
       required: true,
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-const Agent = mongoose.model("Agent", agentSchema);
-export default Agent;
+export default mongoose.model("Agent", agentSchema);

@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Alert, Spinner, TextInput } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/Authcontext";
 
 export default function Signin() {
   const [formData, setFormData] = useState({});
   const [errorMessage, setErrorMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
@@ -37,6 +40,7 @@ export default function Signin() {
       }
 
       setLoading(false);
+      login(data);
       navigate("/");
     } catch (error) {
       setErrorMessage(error.message);

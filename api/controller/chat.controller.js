@@ -1,55 +1,88 @@
-import Conversation from "../models/conversation.model.js";
+import Chat from "../models/chat.model.js";
 import Prompt from "../models/prompt.model.js";
+import Groq from "groq-sdk";
+console.log("GROQ KEY:", process.env.GROQ_API_KEY);
 
-/**
- * SEND MESSAGE (USER)
- */
-export const sendMessage = async (req, res, next) => {
+if (!process.env.GROQ_API_KEY) {
+  throw new Error("GROQ_API_KEY missing. Check .env loading");
+}
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
+
+export const getOrCreateChat = async (req, res, next) => {
   try {
-    const { conversationId, message } = req.body;
+    const { agentId } = req.params;
 
-    if (!conversationId || !message) {
-      return res.status(400).json({ message: "conversationId & message required" });
-    }
-
-    const conversation = await Conversation.findOne({
-      _id: conversationId,
+    let chat = await Chat.findOne({
+      agentId,
       userId: req.user.id,
     });
 
-    if (!conversation) {
-      return res.status(404).json({ message: "Conversation not found" });
-    }
-
-    /**
-     * IF FIRST MESSAGE → LOAD SYSTEM PROMPTS
-     */
-    if (conversation.messages.length === 0) {
+    if (!chat) {
       const systemPrompts = await Prompt.find({
-        agentId: conversation.agentId,
+        agentId,
         userId: req.user.id,
       });
 
-      systemPrompts.forEach((prompt) => {
-        conversation.messages.push({
+      chat = await Chat.create({
+        agentId,
+        userId: req.user.id,
+        messages: systemPrompts.map((p) => ({
           role: "system",
-          content: prompt.content,
-        });
+          content: p.content,
+        })),
       });
     }
 
-    /**
-     * PUSH USER MESSAGE
-     */
-    conversation.messages.push({
+    res.status(200).json(chat);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const sendMessage = async (req, res, next) => {
+  try {
+    const { agentId, message } = req.body;
+
+    if (!agentId || !message) {
+      return res.status(400).json({ message: "agentId & message required" });
+    }
+
+    const chat = await Chat.findOne({
+      agentId,
+      userId: req.user.id,
+    });
+
+    if (!chat) {
+      return res.status(404).json({ message: "Chat not found" });
+    }
+
+    chat.messages.push({
       role: "user",
       content: message,
     });
 
-    await conversation.save();
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: chat.messages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      })),
+    });
 
-    res.status(200).json(conversation);
-  } catch (error) {
-    next(error);
+    const aiReply = completion.choices[0]?.message?.content || "No response";
+
+    chat.messages.push({
+      role: "assistant",
+      content: aiReply,
+    });
+
+    await chat.save();
+
+    res.status(200).json(chat);
+  } catch (err) {
+    next(err);
   }
 };

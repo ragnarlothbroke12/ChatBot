@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 
 export const signin = async (req, res, next) => {
     const { email, password } = req.body;
-
+    
     if (!email || !password || email === '' || password === '') {
         next(errorHandler(400, 'All fields are required'));
         console.log(email, password);
@@ -15,6 +15,7 @@ export const signin = async (req, res, next) => {
 
     try {
         const user = await User.findOne({ email });
+        
         if (!user) {
             next(errorHandler(404, 'User not found'));
             return;
@@ -43,6 +44,8 @@ export const signin = async (req, res, next) => {
 export const signup = async (req, res, next) => {
     
     const { name, email, password } = req.body;
+    console.log("✅ SIGNUP API HIT");
+    console.log(req.body);
 
     if(!name || 
         !email || 

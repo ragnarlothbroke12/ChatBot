@@ -1,14 +1,15 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { Alert, Spinner, TextInput } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/Authcontext";
+import { useAuth } from "../context/Authcontext";
 
 export default function Signin() {
   const [formData, setFormData] = useState({});
   const [errorMessage, setErrorMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+
+  const { login } = useAuth();
 
 
   const handleChange = (e) => {

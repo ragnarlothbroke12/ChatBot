@@ -1,6 +1,8 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cors from 'cors'; // ✅ add this
+
 import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
 import projectRouter from './routes/project.route.js';
@@ -9,56 +11,36 @@ import promptRouter from './routes/prompt.route.js';
 import chatRouter from './routes/chat.route.js';
 import cookieParser from 'cookie-parser';
 
-
-const app = express();
-app.use(express.json());
-
-
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({
-  path: path.resolve(__dirname, "../.env"),
-});
-
-
 dotenv.config();
 
 mongoose.connect(process.env.MONGO)
-.then(() => {
-  console.log('Connected to MongoDB !!');
-})
-.catch((err) => {
-  console.error('Error connecting to MongoDB:', err);
-});
+.then(() => console.log('Connected to MongoDB !!'))
+.catch(err => console.error('Error connecting to MongoDB:', err));
 
-;
+const app = express();
 
-
+app.use(express.json());
 app.use(cookieParser());
+
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 
 app.listen(3000, () => {
   console.log('API server is running on port 3000 !!');
-  console.log("API KEY:", process.env.GROQ_API_KEY);
 });
 
-console.log("ENV CHECK:", {
-  MONGO: process.env.MONGO ? "OK" : "❌",
-  JWT: process.env.JWT_SECRET ? "OK" : "❌",
-  GROQ: process.env.GROQ_API_KEY ? "OK" : "❌",
-});
-
-
+// Routers
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/projects', projectRouter);
-app.use("/api/agents", agentRouter);
-app.use("/api/prompts", promptRouter);
-app.use("/api/chat", chatRouter);
+app.use('/api/agents', agentRouter);
+app.use('/api/prompts', promptRouter);
+app.use('/api/chat', chatRouter);
 
+// Global Error Handler
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
     const message = err.message || 'Internal Server Error';
@@ -68,4 +50,3 @@ app.use((err, req, res, next) => {
         message
     });
 });
-

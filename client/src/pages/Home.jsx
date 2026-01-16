@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import { AuthContext } from "../context/Authcontext";
+import { useAuth } from "../context/Authcontext";
 
 export default function Home() {
-  const { user } = useContext(AuthContext);
+ const { user, token } = useAuth();
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-28 text-center">

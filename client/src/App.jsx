@@ -6,6 +6,7 @@ import Chat from "./pages/Chat"; // <-- naya import
 import Header from "./components/Header";
 import PageWrapper from "./components/pageWrapper";
 import { AuthProvider } from "./context/Authcontext";
+import Dashboard from "./pages/Dashboard";
 
 export default function App() {
   return (
@@ -17,7 +18,8 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/sign-in" element={<Signin />} />
             <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/chat" element={<Chat />} /> {/* <-- add this */}
+            <Route path="/chat" element={<Chat />} /> 
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </PageWrapper>
       </BrowserRouter>

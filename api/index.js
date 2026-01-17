@@ -9,6 +9,7 @@ import projectRouter from './routes/project.route.js';
 import agentRouter from './routes/agent.route.js';
 import promptRouter from './routes/prompt.route.js';
 import chatRouter from './routes/chat.route.js';
+import dashboardRouter from './routes/dashboard.route.js';
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -39,6 +40,7 @@ app.use('/api/projects', projectRouter);
 app.use('/api/agents', agentRouter);
 app.use('/api/prompts', promptRouter);
 app.use('/api/chat', chatRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

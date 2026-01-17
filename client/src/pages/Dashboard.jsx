@@ -1,41 +1,41 @@
 import { useEffect, useState } from "react";
 import { getUserStats } from "../api/dashboardApi";
+import DashboardCard from "../components/DashboardCard";
+import "../styles/dashboard.css";
 
-export default function Dashboard() {
+const Dashboard = () => {
   const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchStats() {
-      try {
-        const data = await getUserStats();
+    getUserStats()
+      .then((data) => {
         setStats(data);
-      } catch (err) {
-        console.error("Error fetching dashboard stats:", err);
-      }
-    }
-
-    fetchStats();
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
 
-  if (!stats) return <div className="p-4">Loading dashboard...</div>;
+  if (loading) return <h2 className="loading">Loading Dashboard...</h2>;
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+    <div className="dashboard">
+      <h1>📊 Dashboard</h1>
+      <p className="subtitle">Welcome back 👋</p>
 
-      <div className="bg-white p-4 rounded shadow mb-4">
-        <h2 className="font-semibold">Total Chats</h2>
-        <p className="text-xl">{stats.totalChats}</p>
-      </div>
-
-      <div className="bg-white p-4 rounded shadow">
-        <h2 className="font-semibold mb-2">Recent Chats</h2>
-        {stats.recentChats.map((c, i) => (
-          <div key={i} className="text-sm text-gray-600">
-            Agent: {c.agentId}
-          </div>
-        ))}
+      <div className="dashboard-grid">
+        <DashboardCard title="Total Chats" value={stats.totalChats} />
+        <DashboardCard title="AI Agents" value={stats.totalAgents} />
+        <DashboardCard
+          title="Last Login"
+          value={new Date(stats.lastLogin).toLocaleString()}
+        />
       </div>
     </div>
   );
-}
+};
+
+export default Dashboard;
